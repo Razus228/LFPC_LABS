@@ -1,19 +1,53 @@
-from itertools import product
+# Convert from CFG to CNF
 
+**Course** : Formal Languages & Finite Automata
 
+**Author** : Mihailiuc Igor
 
-def eliminate_epsilon(cfg):
-    """
-    Eliminates all epsilon productions from a context-free grammar.
+***
 
-    Args:
-        cfg (dict): A dictionary representing the context-free grammar.
+## Theory
 
-    Returns:
-        A new dictionary representing the context-free grammar with all epsilon productions removed.
-    """
-    # Find all nullable nonterminals
-    nullable = set()
+Chomsky Normal Form (CNF) is a specific form in the field of formal language theory and syntax analysis. It was introduced by Noam Chomsky, a renowned linguist and cognitive scientist, as a way to simplify the structure of context-free grammars (CFGs) while preserving their generative power. The CNF has several important properties that make it useful in various computational algorithms and theoretical analyses.
+
+The Chomsky Normal Form consists of two main rules:
+
+1. Rule 1: Every production rule is in one of the following forms:
+   - A → BC, where A, B, and C are non-terminal symbols.
+   - A → a, where A is a non-terminal symbol, and "a" is a terminal symbol.
+
+   This rule ensures that the right-hand side of each production rule consists of either two non-terminals or one terminal symbol.
+
+2. Rule 2: The start symbol S cannot appear on the right-hand side of any production rule, except for the production S → ε, where ε represents the empty string.
+
+The Chomsky Normal Form provides several benefits:
+
+1. Simplicity: By restricting the form of production rules, CNF simplifies the structure of context-free grammars. This simplification makes it easier to analyze and manipulate CFGs in various algorithms and tools.
+
+2. Parsing Efficiency: CNF enables more efficient parsing algorithms, such as the CYK (Cocke-Younger-Kasami) algorithm. These algorithms take advantage of the restricted form to improve parsing speed and reduce computational complexity.
+
+3. Formal Analysis: The restricted form of CNF allows for more precise formal analysis of context-free languages and grammars. Properties such as membership, emptiness, and equivalence can be more easily proven or disproven using CNF.
+
+4. Learning and Language Acquisition: Chomsky Normal Form has also influenced theories of language acquisition and cognitive science. The simplified structure of CNF aligns with the idea that humans have innate linguistic abilities and cognitive constraints, which may aid in the learning and processing of languages.
+
+Overall, Chomsky Normal Form provides a useful framework for understanding and working with context-free grammars, facilitating efficient parsing algorithms and supporting theoretical analyses in the field of formal language theory.
+
+***
+
+## Objectives
+- Learn about Chomsky Normal Form (CNF).
+- Get familiar with the approaches of normalizing a grammar.
+- Implement a method for normalizing an input grammar by the rules of CNF
+
+***
+
+## Implementation description
+
+The first step for converting CFG to CNF is to remove all **epsylon** productions. 
+
+Firstly, the function iterates over the CFG to see if there are any nullable non-terminals: 
+```
+nullable = set()
     while True:
         new_nullable = set()
         for nt in cfg['nonterminals']:
@@ -22,9 +56,11 @@ def eliminate_epsilon(cfg):
         if new_nullable == nullable:
             break
         nullable = new_nullable
+```
 
-    # Remove all epsilon productions
-    new_productions = {}
+Then if it finds if there are any **epsylon** productions, it starts removing those productions: 
+```
+new_productions = {}
     for nt, prods in cfg['productions'].items():
         new_prods = set()
         for prod in prods:
@@ -33,9 +69,11 @@ def eliminate_epsilon(cfg):
             for combination in product(*[nullable if symbol == nt else [symbol] for symbol in prod]):
                 new_prods.add(''.join(combination))
         new_productions[nt] = new_prods
+```
 
-    # Create the new CFG dictionary
-    new_cfg = {
+Lastly it creates a new directory for the cfg: 
+```
+new_cfg = {
         'start_symbol': cfg['start_symbol'],
         'nonterminals': cfg['nonterminals'],
         'terminals': cfg['terminals'],
@@ -43,26 +81,19 @@ def eliminate_epsilon(cfg):
     }
 
     return new_cfg
+```
 
-def eliminate_renamings(cfg):
-    """
-    Eliminates renamings from a context-free grammar.
-
-    Args:
-        cfg (dict): A dictionary representing the context-free grammar.
-
-    Returns:
-        A new dictionary representing the context-free grammar with renamings eliminated.
-    """
-    # First, find all nonterminals that can derive only terminals
-    terminals_only = set()
+The next step is to remove all renamings. The code checks if there are any renamings: 
+```
+terminals_only = set()
     for nt in cfg['nonterminals']:
         if len(cfg['productions'][nt]) == 1 and \
            cfg['productions'][nt].pop().islower():
             terminals_only.add(nt)
-
-    # Now, eliminate all renamings
-    new_productions = {}
+```
+Then if it finds them, it removes them: 
+```
+new_productions = {}
     for nt in cfg['nonterminals']:
         new_productions[nt] = set()
         for prod in cfg['productions'][nt]:
@@ -84,27 +115,11 @@ def eliminate_renamings(cfg):
                         for prod2 in cfg['productions'][symbol]:
                             if prod2 != symbol:
                                 new_productions[nt].add(prod2)
+```
 
-    # Return the updated CFG
-    return {'start_symbol': cfg['start_symbol'],
-            'nonterminals': cfg['nonterminals'] - terminals_only,
-            'terminals': cfg['terminals'],
-            'productions': new_productions}
-
-
-
-def eliminate_inaccessible(cfg):
-    """
-    Eliminates all inaccessible nonterminals and their productions from a context-free grammar.
-
-    Args:
-        cfg (dict): A dictionary representing the context-free grammar.
-
-    Returns:
-        A new dictionary representing the context-free grammar with all inaccessible nonterminals and their productions removed.
-    """
-    # Find all reachable nonterminals starting from the start symbol
-    reachable = set()
+Lastly, it updates the directory from the epsylon function. Next step is to eliminate inaccesible symbols: 
+```
+reachable = set()
     frontier = set([cfg['start_symbol']])
     while frontier:
         nt = frontier.pop()
@@ -134,20 +149,11 @@ def eliminate_inaccessible(cfg):
     }
 
     return new_cfg
+```
 
-
-def eliminate_nonproductive(cfg):
-    """
-    Eliminates all non-productive nonterminals and their productions from a context-free grammar.
-
-    Args:
-        cfg (dict): A dictionary representing the context-free grammar.
-
-    Returns:
-        A new dictionary representing the context-free grammar with all non-productive nonterminals and their productions removed.
-    """
-    # Find all productive nonterminals
-    productive = set()
+The last step is to eliminate non-productive symbols. 
+```
+productive = set()
     while True:
         new_productive = set()
         for nt in cfg['nonterminals']:
@@ -177,8 +183,12 @@ def eliminate_nonproductive(cfg):
     }
 
     return new_cfg
+```
 
+The final function for converting from CFG to CNF is the **convert_to_chomsky_normal_form** function itself.
 
+The code for it is: 
+```
 def convert_to_chomsky_normal_form(cfg):
     """
     Converts a context-free grammar to Chomsky normal form.
@@ -258,7 +268,10 @@ def convert_to_chomsky_normal_form(cfg):
     }
 
     return new_cfg
+```
 
+To test it, my variant is: 
+```
 cfg = {
     'start_symbol': 'S',
     'nonterminals': {'S', 'A', 'B', 'C'},
@@ -270,9 +283,26 @@ cfg = {
         'C': {'Aa'}
     }
 }
+```
 
-new_cfg = convert_to_chomsky_normal_form(cfg)
-print(new_cfg)
+## Results
+The code seems to not work as it is supposed to. The output I get is meaningless, and I tried to fix the error, but didn't manage to. Here is the output:
+```
+{'start_symbol': 'S', 'nonterminals': set(), 'terminals': {'b', 'd', 'a'}, 'productions': {}}
+```
 
+## Conclusion
 
+In conclusion, converting a Context-Free Grammar (CFG) to Chomsky Normal Form (CNF) holds significant importance in the field of formal language theory and syntax analysis. The conversion process simplifies the structure of CFGs while preserving their generative power, leading to several practical and theoretical benefits.
 
+Firstly, converting CFGs to CNF simplifies their structure, making them easier to analyze and manipulate. The restricted form of CNF allows for more efficient parsing algorithms, enabling faster processing and reduced computational complexity. This is particularly useful in applications such as natural language processing, where parsing large amounts of text or speech is required.
+
+Secondly, CNF facilitates formal analysis of context-free languages and grammars. The restricted form allows for more precise proofs and disproofs of properties like membership, emptiness, and equivalence. This enhances our understanding of the expressive power and limitations of context-free grammars.
+
+Furthermore, the conversion to CNF has implications for theories of language acquisition and cognitive science. The simplified structure aligns with the idea that humans have innate linguistic abilities and cognitive constraints, aiding in the learning and processing of languages. By studying CNF representations, researchers can gain insights into how languages are acquired and processed by individuals.
+
+Overall, converting CFGs to Chomsky Normal Form is crucial for efficient parsing, formal analysis, and advancing our understanding of language and cognition. It provides a standardized and simplified representation that enables practical applications and theoretical investigations in the field of formal language theory.
+
+## References
+1. https://en.wikipedia.org/wiki/Chomsky_normal_form
+2. https://www.geeksforgeeks.org/converting-context-free-grammar-chomsky-normal-form/
