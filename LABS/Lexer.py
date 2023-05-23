@@ -1,5 +1,5 @@
 import re
-import Tokens
+import Tokens as Tokens
 
 
 class Lexer:
@@ -8,7 +8,7 @@ class Lexer:
     tokens = "|".join(f"(?P<{name}>{regex})" for name, regex in Tokens.tokens.items())
 
     def __init__(self, file_name):
-        self.file = open(file_name, "r")
+        self.file = open(file_name)
         self.content = self.file.read()
 
     def tokenize(self):

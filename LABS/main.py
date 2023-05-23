@@ -1,7 +1,7 @@
 from Lexer import Lexer
 
 def main():
-    program = Lexer("example.txt")
+    program = Lexer("example/example.txt")
     toks = program.tokenize()
     for t in toks: 
         print(t)

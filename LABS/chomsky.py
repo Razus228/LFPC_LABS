@@ -52,7 +52,7 @@ def eliminate_epsilon(cfg):
         'productions': new_productions
     }
 
-    return new_cfg
+    return cfg
 
 def eliminate_renamings(cfg):
     """
@@ -96,12 +96,16 @@ def eliminate_renamings(cfg):
                                 new_productions[nt].add(prod2)
 
     # Return the updated CFG
-    return {'start_symbol': cfg['start_symbol'],
-            'nonterminals': cfg['nonterminals'] - terminals_only,
-            'terminals': cfg['terminals'],
-            'productions': new_productions}
+    new_cfg = {
+        'start_symbol': cfg['start_symbol'],
+        'nonterminals': cfg['nonterminals'] - terminals_only,
+        'terminals': cfg['terminals'],
+        'productions': new_productions
+    }
+    
+    return new_cfg
 
-
+    
 
 def eliminate_inaccessible(cfg):
     """
@@ -201,6 +205,7 @@ def convert_to_chomsky_normal_form(cfg):
     """
     # Step 1: Eliminate ε-productions
     cfg = eliminate_epsilon(cfg)
+    print("0" + str(cfg))
 
     # Step 2: Eliminate unit productions
     cfg = eliminate_renamings(cfg)
@@ -210,7 +215,7 @@ def convert_to_chomsky_normal_form(cfg):
 
     # Step 4: Eliminate inaccessible nonterminals and productions
     cfg = eliminate_nonproductive(cfg)
-
+    print("1" + str(cfg))
     # Step 5: Replace terminals in productions with new nonterminals
     new_productions = {}
     new_nonterminals = set()
@@ -231,7 +236,7 @@ def convert_to_chomsky_normal_form(cfg):
                     new_productions[nt].add(terminal_productions[symbol])
                 else:
                     new_productions[nt].add(prod)
-
+    print("2" + str(cfg))
     # Step 6: Replace long productions with new nonterminals
     while True:
         new_nt_productions = {}
@@ -259,6 +264,7 @@ def convert_to_chomsky_normal_form(cfg):
             break
         new_productions = new_nt_productions
 
+    print("3" + str(cfg))
     # Create the new CFG dictionary
     new_cfg = {
         'start_symbol': cfg['start_symbol'],
@@ -269,8 +275,5 @@ def convert_to_chomsky_normal_form(cfg):
 
     return new_cfg
 
-new_cfg = convert_to_chomsky_normal_form(cfg)
-print(new_cfg)
-
-
+print (convert_to_chomsky_normal_form(cfg))
 
