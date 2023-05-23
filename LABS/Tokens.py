@@ -9,6 +9,6 @@ tokens = {
     "RPAREN" : r"\)",
     "NEWLINE": r"\n | \r | \r \n",
     "WHITESPACE": r"[ ]+",
-    "INVALID": r".+"
+    "INVALID": r".+",
 
 }

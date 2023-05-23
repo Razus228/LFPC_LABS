@@ -1,10 +1,9 @@
-from Lexer import Lexer
+from Parser import Parser
 
 def main():
-    program = Lexer("example/example.txt")
-    toks = program.tokenize()
-    for t in toks: 
-        print(t)
+    program = Parser("example/example.txt")
+    program.parse()
+    program.show_ast()
 
 if __name__ == '__main__':
     main()
